@@ -1,62 +1,46 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import '../../screens/tab_bar/tab_screen.dart';
 
 class ChildTabScreen extends StatefulWidget {
-  final String kind;
-  ChildTabScreen({Key? key, required this.kind}) : super(key: key);
+  final int? index;
+  const ChildTabScreen({Key? key, required this.index}) : super(key: key);
 
   @override
-  _TabScreenState createState() => _TabScreenState();
+  ChildScreenState createState() => ChildScreenState();
 }
 
-class _TabScreenState extends State<ChildTabScreen> {
-  int currentIndex = 0;
-
-  // @override
-  // void didUpdateWidget(covariant ChildTabScreen oldWidget) {
-  //   setState(() {
-  //     currentIndex = widget.kind.toIndex();
-  //   });
-  //   super.didUpdateWidget(oldWidget);
-  // }
+class ChildScreenState extends State<ChildTabScreen>
+    with AutomaticKeepAliveClientMixin {
+  int _currentIndex = 0;
 
   @override
   void didChangeDependencies() {
-    setState(() {
-      currentIndex = widget.kind.toIndex();
-    });
+    if (widget.index != null) {
+      setState(() {
+        _currentIndex = widget.index!;
+      });
+    }
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: const <Widget>[
-          Center(
-            child: Text('one'),
-          ),
-          Center(
-            child: Text('two'),
-          ),
-          Center(
-            child: Text('three'),
-          ),
-        ],
-      ),
+      body: IndexedStack(index: _currentIndex, children: const <Widget>[
+        Center(
+          child: Text('one'),
+        ),
+        Center(
+          child: Text('two'),
+        ),
+        Center(
+          child: Text('three'),
+        ),
+      ]),
       bottomNavigationBar: BottomNavigationBar(
-          currentIndex: currentIndex,
+          currentIndex: _currentIndex,
           onTap: (index) {
-            if (index == 0) {
-              Navigator.of(context).pushNamed('/tab-bar/two/one');
-            } else if (index == 1) {
-              Navigator.of(context).pushNamed('/tab-bar/two/two');
-            } else if (index == 2) {
-              Navigator.of(context).pushNamed('/tab-bar/two/three');
-            }
+            _currentIndex = index;
           },
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'one'),
@@ -65,19 +49,7 @@ class _TabScreenState extends State<ChildTabScreen> {
           ]),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
-
-// extension StringExt on String {
-//   int toIndex() {
-//     switch (this) {
-//       case 'two':
-//         return 1;
-//       case 'three':
-//         return 2;
-
-//       case 'one':
-//       default:
-//         return 0;
-//     }
-//   }
-// }

@@ -5,42 +5,62 @@ import '../../screens/tab_bar/child_tab_bar.dart';
 
 class TabScreen extends StatefulWidget {
   final String kind;
-  final String? kind2;
-  TabScreen({Key? key, required this.kind, this.kind2}) : super(key: key);
+
+  const TabScreen({Key? key, required this.kind}) : super(key: key);
 
   @override
   _TabScreenState createState() => _TabScreenState();
 }
 
 class _TabScreenState extends State<TabScreen> {
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
   int currentIndex = 0;
+  int? subIndex;
 
-  // @override
-  // void didUpdateWidget(covariant TabScreen oldWidget) {
-  //   setState(() {
-  //     currentIndex = widget.kind.toIndex();
-  //   });
-  //   super.didUpdateWidget(oldWidget);
-  // }
+  final pageController = PageController();
+
+  void onTap(int index) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (pageController.hasClients) {
+        pageController.jumpToPage(index);
+      }
+    });
+  }
+
+  void onPageChanged(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
 
   @override
   void didChangeDependencies() {
-    setState(() {
-      currentIndex = widget.kind.toIndex();
-    });
+    final tabsIndex = widget.kind.toIndex();
+    currentIndex = tabsIndex[0];
+    onTap(currentIndex);
+
+    if (tabsIndex.length == 2) {
+      subIndex = tabsIndex[1];
+    } else {
+      subIndex = null;
+    }
+
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
+      body: PageView(
+        controller: pageController,
+        onPageChanged: onPageChanged,
         children: <Widget>[
           const Center(
             child: Text('one'),
           ),
-          ChildTabScreen(kind: widget.kind2 ?? 'one'),
+          ChildTabScreen(
+            index: subIndex,
+          ),
           const Center(
             child: Text('three'),
           ),
@@ -49,16 +69,7 @@ class _TabScreenState extends State<TabScreen> {
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: currentIndex,
           onTap: (index) {
-            if (index == 0) {
-              Navigator.of(context)
-                  .pushNamed('/tab-bar/test', arguments: 'one');
-            } else if (index == 1) {
-              Navigator.of(context)
-                  .pushNamed('/tab-bar/test', arguments: 'two');
-            } else if (index == 2) {
-              Navigator.of(context)
-                  .pushNamed('/tab-bar/test', arguments: 'three');
-            }
+            onTap(index);
           },
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'one'),
@@ -70,16 +81,22 @@ class _TabScreenState extends State<TabScreen> {
 }
 
 extension StringExt on String {
-  int toIndex() {
+  List<int> toIndex() {
     switch (this) {
       case 'two':
-        return 1;
+        return [1];
+      case 'two/one':
+        return [1, 0];
+      case 'two/two':
+        return [1, 1];
+      case 'two/three':
+        return [1, 2];
       case 'three':
-        return 2;
+        return [2];
 
       case 'one':
       default:
-        return 0;
+        return [0];
     }
   }
 }
