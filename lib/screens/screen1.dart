@@ -29,7 +29,7 @@ class Screen1 extends StatelessWidget {
               final navigator = Navigator.of(context);
               final canPop = navigator.canPop();
               if (canPop) {
-                Navigator.pop(context);
+                navigator.pop();
               } else {
                 ScaffoldMessenger.of(context)
                     .showSnackBar(const SnackBar(content: Text('can not pop')));
