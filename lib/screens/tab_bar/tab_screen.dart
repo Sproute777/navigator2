@@ -13,7 +13,6 @@ class TabScreen extends StatefulWidget {
 }
 
 class _TabScreenState extends State<TabScreen> {
-  final ValueNotifier<int> index = ValueNotifier<int>(0);
   int currentIndex = 0;
   int? subIndex;
 
@@ -54,6 +53,8 @@ class _TabScreenState extends State<TabScreen> {
       body: PageView(
         controller: pageController,
         onPageChanged: onPageChanged,
+        // отлкючить скролл табов
+        physics: const NeverScrollableScrollPhysics(),
         children: <Widget>[
           const Center(
             child: Text('one'),

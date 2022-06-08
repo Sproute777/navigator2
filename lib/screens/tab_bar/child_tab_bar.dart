@@ -40,7 +40,9 @@ class ChildScreenState extends State<ChildTabScreen>
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) {
-            _currentIndex = index;
+            setState(() {
+              _currentIndex = index;
+            });
           },
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'one'),
